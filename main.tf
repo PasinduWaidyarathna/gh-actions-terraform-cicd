@@ -33,24 +33,15 @@ resource "aws_s3_bucket_versioning" "versioning_example" {
   }
 }
 
-resource "aws_kms_key" "mykey" {
-  description             = "This key is used to encrypt bucket objects"
-  enable_key_rotation     = true
-  deletion_window_in_days = 7
-}
-
 resource "aws_s3_bucket_server_side_encryption_configuration" "example" {
   bucket = aws_s3_bucket.example.id
   rule {
     apply_server_side_encryption_by_default {
-      # Use AES256 instead of aws:kms
       sse_algorithm = "AES256"
-      # remove kms_master_key_id
     }
   }
 }
 
-# Static Website Hosting
 resource "aws_s3_bucket_website_configuration" "example" {
   bucket = aws_s3_bucket.example.id
   index_document {
@@ -61,9 +52,8 @@ resource "aws_s3_bucket_website_configuration" "example" {
   }
 }
 
-# Public Read Access Policy (for website files)
 resource "aws_s3_bucket_policy" "public_read" {
-  # Add explicit dependency on public access block
+
   depends_on = [aws_s3_bucket_public_access_block.example]
   
   bucket = aws_s3_bucket.example.id
